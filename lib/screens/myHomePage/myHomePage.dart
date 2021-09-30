@@ -20,9 +20,7 @@ class _MyHomePageState extends State<MyHomePage> {
     return SafeArea(
       child: Scaffold(
         key: _key,
-        drawer: Drawer(
-
-        ),
+        drawer:customDrawer(),
         backgroundColor: Color(0xffF4F3F4),
 
         body: Column(
@@ -133,4 +131,69 @@ class _MyHomePageState extends State<MyHomePage> {
   filterDialogScreen() {
 
   }
+  customDrawer () {
+    return Drawer(
+      child: Column(
+        children: [
+          Container(
+            height: 165,
+            width: double.infinity,
+            color:Color(0xff2C6DD5)
+          ),
+          Container(
+          padding: EdgeInsets.all(20),
+            child: Column(
+              children: [
+                Row(
+                  children: [
+                    Icon(Icons.person,size: 25,),
+                    SizedBox(
+                      width: 5,
+                    ),
+                    Text("Person",style: TextStyle(
+                      fontSize: 18,
+                      fontWeight: FontWeight.w700,
+
+                    ),)
+                  ],
+                ),
+                SizedBox(height: 10,),
+                Row(
+                  children: [
+                    Icon(Icons.settings,size: 25,),
+                    SizedBox(
+                      width: 5,
+                    ),
+                    Text("Настройка",style: TextStyle(
+                        fontSize: 18,
+                        fontWeight: FontWeight.w700,
+
+                    ),)
+                  ],
+                ),
+                SizedBox(height: 10,),
+                Row(
+                  children: [
+                    Icon(Icons.announcement_outlined,size: 25,),
+                    SizedBox(
+                      width: 5,
+                    ),
+                    Text("О нас",style: TextStyle(
+                      fontSize: 18,
+                      fontWeight: FontWeight.w700,
+
+                    ),)
+                  ],
+                ),
+                SizedBox(height: 10,),
+
+              ],
+            )
+          ),
+
+        ],
+      ),
+    );
+  }
+
 }
