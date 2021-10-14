@@ -1,5 +1,11 @@
-import 'package:carwash/main.dart';
-import 'package:carwash/screens/myhome_page//myHomePage.dart';
+import 'dart:convert';
+
+
+import 'package:carwash/Constants.dart';
+import 'package:carwash/screens/myhome_page/myHomePage.dart';
+import 'package:flutter_easyloading/flutter_easyloading.dart';
+import 'package:get/get.dart';
+import 'package:http/http.dart' as http;
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 class Login extends StatefulWidget {
@@ -12,6 +18,11 @@ class Login extends StatefulWidget {
 class _LoginState extends State<Login> {
 
   var texts = ["Login","Registratsiya"];
+  TextEditingController _phone = TextEditingController();
+  TextEditingController _password = TextEditingController();
+  TextEditingController _phoneRegister = TextEditingController();
+  TextEditingController _passwordRegister = TextEditingController();
+  TextEditingController _name = TextEditingController();
   int textIndex = 0;
   @override
   Widget build(BuildContext context) {
@@ -77,6 +88,8 @@ class _LoginState extends State<Login> {
                               Container(
                                 height: 45,
                                 child: TextField(
+                                  controller: _phone,
+                                keyboardType: TextInputType.phone,
                                 decoration: InputDecoration(
                                   border: OutlineInputBorder(
                                     borderSide: const BorderSide(color: Colors.teal, width: 2.0),
@@ -94,6 +107,9 @@ class _LoginState extends State<Login> {
                               Container(
                                 height: 45,
                                 child: TextField(
+                                  controller: _password,
+                                  keyboardType: TextInputType.visiblePassword,
+                                  obscureText: true,
                                   decoration: InputDecoration(
                                       border: OutlineInputBorder(
                                         borderSide: const BorderSide(color: Colors.teal, width: 2.0),
@@ -114,7 +130,9 @@ class _LoginState extends State<Login> {
                       Container(
                           width: 270,
                           child: ElevatedButton(onPressed: () {
-                          Navigator.push(context, MaterialPageRoute(builder: (context) => MyHomePage()));
+
+                           _phone.text.length > 0 && _password.text.length > 0 ? login():EasyLoading.showError("Malumotlarni to'liq kiriting");
+
                           }, child: Text("Kirish",style: TextStyle(
                             fontWeight: FontWeight.w700,
                             fontSize: 15
@@ -134,6 +152,7 @@ class _LoginState extends State<Login> {
                            Container(
                              height: 45,
                              child: TextField(
+                               controller: _name,
                                decoration: InputDecoration(
                                    border: OutlineInputBorder(
                                      borderSide: const BorderSide(color: Colors.teal, width: 2.0),
@@ -151,6 +170,8 @@ class _LoginState extends State<Login> {
                            Container(
                              height: 45,
                              child: TextField(
+                               keyboardType: TextInputType.phone,
+                               controller: _phoneRegister,
                                decoration: InputDecoration(
                                    border: OutlineInputBorder(
                                      borderSide: const BorderSide(color: Colors.teal, width: 2.0),
@@ -168,6 +189,8 @@ class _LoginState extends State<Login> {
                            Container(
                              height: 45,
                              child: TextField(
+                               obscureText: true,
+                               controller: _passwordRegister,
                                decoration: InputDecoration(
                                    border: OutlineInputBorder(
                                      borderSide: const BorderSide(color: Colors.teal, width: 2.0),
@@ -187,7 +210,9 @@ class _LoginState extends State<Login> {
 
                      Container(
                          width: 270,
-                         child: ElevatedButton(onPressed: () {}, child: Text("Ro'yhatdan o'tish",style: TextStyle(
+                         child: ElevatedButton(onPressed: () {
+                         _passwordRegister.text.length > 0 && _name.text.length > 0 && _phone.text.length > 0 ? register():EasyLoading.showError("Malumotlarni to'liq kiriting");
+                         }, child: Text("Ro'yhatdan o'tish",style: TextStyle(
                            fontSize: 15,
                            fontWeight: FontWeight.w700
                          ),))
@@ -204,5 +229,59 @@ class _LoginState extends State<Login> {
 
 
     );
+
+
+
+  }
+  Future login () async{
+
+    EasyLoading.show();
+   Map user = {
+    "phone":_phone.text,
+    "password":_password.text
+   };
+   print(user);
+   try {
+     http.Response response = await http.post(Uri.parse("$Url/login"),body: user);
+     var data = jsonDecode(response.body);
+        print(data);
+     if(data["success"]) {
+       EasyLoading.showSuccess("Kirish muffaqqiyatli bo'ldi");
+       Get.off(() => MyHomePage());
+     }
+     else {
+       EasyLoading.showError(data['message'].toString());
+     }
+
+   }
+   catch(e) {
+     EasyLoading.showError(e.toString());
+   }
+
+
+  }
+  Future register () async{
+    Map user = {
+      "phone":_phoneRegister.text,
+      "password":_passwordRegister.text,
+      "name":_name.text
+    };
+    try {
+      http.Response  response = await http.post(Uri.parse("$Url/register"),body: user);
+      var data = jsonDecode(response.body);
+      if(data["success"]) {
+        EasyLoading.showSuccess("Foydalanuvchi mufaqqiyatli ro'yhatdan o'tdi");
+        _name.text = "";
+        _passwordRegister.text = "";
+        _phoneRegister.text = "";
+      }
+      else {
+        EasyLoading.showError(data['message'].toString());
+      }
+    }
+    catch(e) {
+      EasyLoading.showError(e.toString());
+    }
+
   }
 }
